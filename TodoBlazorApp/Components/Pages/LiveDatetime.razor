@@ -1,0 +1,43 @@
+﻿@page "/livedatetime"
+@rendermode InteractiveServer
+
+<style>
+    .top-right {
+        position: absolute;
+        top: 10%;
+        right: 5%;
+        background-color: white;
+        padding: 5px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+    }
+</style>
+
+<div class="top-right">
+    <p>@currentDateTime</p>
+</div>
+
+@code {
+    private DateTime currentDateTime = DateTime.Now;
+    private System.Timers.Timer? timer;
+
+    protected override void OnInitialized() {
+        timer = new System.Timers.Timer(1000); // Set the timer interval to 1 second
+        #pragma warning disable CS8622  // CS8622: Nullability of reference types in type of parameter doesn't match the target delegate
+        timer.Elapsed += UpdateDateTime;
+        #pragma warning restore CS8622
+        timer.Start();
+    }
+
+    private void UpdateDateTime(object sender, System.Timers.ElapsedEventArgs e) {
+        InvokeAsync(() => {
+            currentDateTime = DateTime.Now;
+            StateHasChanged();
+        });
+    }
+
+    public void Dispose() {
+        timer?.Dispose();
+    }
+}
